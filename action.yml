@@ -4,10 +4,12 @@ runs:
   using: "composite"
   steps:
     - name: Install required utilities
+      shell: bash -euxo pipefail {0}
       run: |
         sudo apt-get update
         sudo apt-get install -y curl tar jq
     - name: Download latest pre-built libpostal tarball
+      shell: bash -euxo pipefail {0}
       run: |
         echo "Fetching latest release info from GitHub API..."
         LATEST_URL=$(curl -s https://api.github.com/repos/eni9889/libpostal-release/releases/latest | jq -r '.assets[] | select(.name | endswith("tar.gz")) | .browser_download_url')
@@ -18,6 +20,7 @@ runs:
         echo "Downloading tarball from: $LATEST_URL"
         curl -L -o libpostal.tar.gz "$LATEST_URL"
     - name: Extract libpostal tarball and install
+      shell: bash -euxo pipefail {0}
       run: |
         sudo tar -xzvf libpostal.tar.gz -C /
         sudo ldconfig
