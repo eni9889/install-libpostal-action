@@ -1,0 +1,23 @@
+name: "Install Libpostal"
+description: "Downloads and installs the latest pre-built libpostal library tarball onto the runner from https://github.com/eni9889/libpostal-release"
+runs:
+  using: "composite"
+  steps:
+    - name: Install required utilities
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl tar jq
+    - name: Download latest pre-built libpostal tarball
+      run: |
+        echo "Fetching latest release info from GitHub API..."
+        LATEST_URL=$(curl -s https://api.github.com/repos/eni9889/libpostal-release/releases/latest | jq -r '.assets[] | select(.name | endswith("tar.gz")) | .browser_download_url')
+        if [ -z "$LATEST_URL" ]; then
+          echo "Error: Could not find a tar.gz asset in the latest release."
+          exit 1
+        fi
+        echo "Downloading tarball from: $LATEST_URL"
+        curl -L -o libpostal.tar.gz "$LATEST_URL"
+    - name: Extract libpostal tarball and install
+      run: |
+        sudo tar -xzvf libpostal.tar.gz -C /
+        sudo ldconfig
